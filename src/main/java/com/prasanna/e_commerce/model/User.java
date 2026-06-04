@@ -6,23 +6,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Entity
 @Table(name = "users")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "user_id")
-	private Long userId;
+	private Long id;
 	
 	@Column(nullable = false)
 	private String firstName;
@@ -30,7 +23,7 @@ public class User {
 	@Column(nullable = false)
 	private String lastName;
 	
-	@Column(nullable = false)
+	@Column(nullable = false,unique = true)
 	private String username;
 	
 	@Column(nullable = false,unique = true)
@@ -41,9 +34,6 @@ public class User {
 	
 	@Column(nullable = false)
 	private String address;
-	
-	@Column(nullable = false)
-	private String phone;
 	
 	@Column(nullable = false)
 	private String role;

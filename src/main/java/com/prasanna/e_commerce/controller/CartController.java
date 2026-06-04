@@ -3,35 +3,37 @@ package com.prasanna.e_commerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prasanna.e_commerce.model.CartItem;
 import com.prasanna.e_commerce.service.CartService;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/api/cart")
 public class CartController {
 
 	@Autowired
 	private CartService cartService;
 	
-	@PostMapping("/add/{productId}")
-	public ResponseEntity<String> addToCart(@RequestParam String username,@PathVariable Long productId) {
-		cartService.addToCart(username, productId);
-		return new ResponseEntity<>("Added to cart",HttpStatus.OK);
+	@GetMapping("/view")
+	public ResponseEntity<List<CartItem>> viewCart(){
+		return ResponseEntity.ok(cartService.viewCart());
 	}
 	
-	@GetMapping("/view")
-	public ResponseEntity<List<CartItem>> viewCart(@RequestParam String username){
-		List<CartItem> cartItems=cartService.viewCart(username);
-		return new ResponseEntity<>(cartItems,HttpStatus.OK);
+	@PostMapping("/add/{id}")
+	public ResponseEntity<String> addProductToCart(@PathVariable Long id) {
+		return ResponseEntity.ok(cartService.addProductToCart(id));
+	}
+
+	@DeleteMapping("/remove/{id}")
+	public ResponseEntity<String> removeProductFromCart(@PathVariable Long id){
+		return ResponseEntity.ok(cartService.removeProductFromCart(id));
 	}
 	
 }

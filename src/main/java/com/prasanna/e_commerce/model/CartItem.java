@@ -8,21 +8,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cart_item")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class CartItem {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "cart_id")
-	private Long cartId;
+	private Long id;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -31,5 +26,11 @@ public class CartItem {
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	private Product product;
+	
+	@Column(nullable = false)
+	private Integer quantity;
+
+	@Column(nullable = false)
+	private Double totalAmount;
 	
 }

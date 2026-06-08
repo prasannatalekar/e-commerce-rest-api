@@ -20,6 +20,8 @@ A **Spring Boot REST API** for an e-commerce platform with JWT authentication, r
 ---
 
 ## 📁 Project Structure
+
+```
 src/main/java/com/prasanna/e_commerce/
 ├── controller/
 │   ├── AuthController.java
@@ -31,8 +33,7 @@ src/main/java/com/prasanna/e_commerce/
 │   ├── AdminService.java
 │   ├── ProductService.java
 │   ├── CartService.java
-│   ├── JwtService.java
-│   └── JwtFilter.java
+│   └── JwtService.java
 ├── repository/
 │   ├── UserRepo.java
 │   ├── ProductRepo.java
@@ -51,14 +52,16 @@ src/main/java/com/prasanna/e_commerce/
 │   ├── SecurityConfig.java
 │   ├── PasswordConfig.java
 │   ├── CustomUserDetails.java
-│   └── CustomUserDetailsService.java
+│   ├── CustomUserDetailsService.java
+│   └── JwtFilter.java
 └── exception/
-├── GlobalExceptionHandler.java
-├── ErrorResponse.java
-├── ResourceNotFoundException.java
-├── BadRequestException.java
-├── ConflictException.java
-└── AuthenticationException.java
+    ├── GlobalExceptionHandler.java
+    ├── ErrorResponse.java
+    ├── ResourceNotFoundException.java
+    ├── BadRequestException.java
+    ├── ConflictException.java
+    └── AuthenticationException.java
+```
 
 ---
 
@@ -69,8 +72,8 @@ src/main/java/com/prasanna/e_commerce/
 - View all active products
 - View product by ID
 - Search products by name or category
-- Add product to cart
-- Remove product from cart
+- Add product to cart (auto-updates quantity if already in cart)
+- Remove product from cart (reduces quantity, removes at 0)
 - View cart
 
 ### 👨‍💼 Admin
@@ -96,6 +99,16 @@ src/main/java/com/prasanna/e_commerce/
 - **Role-based access control** — `ROLE_USER` and `ROLE_ADMIN`
 - **Stateless** session management
 - Token expiry — **1 hour**
+
+### JWT Flow
+```
+1. Client sends username/password to /api/auth/login
+2. Server validates credentials and returns JWT token
+3. Client sends token in every request header:
+   Authorization: Bearer <token>
+4. JwtFilter validates token on every request
+5. If valid → request proceeds to controller
+```
 
 ---
 
@@ -155,7 +168,7 @@ cd e-commerce-rest-api
 CREATE DATABASE e_commerce;
 ```
 
-**3. Configure `application.properties`:**
+**3. Configure `application.properties`** (see `application.properties.example`):
 ```properties
 spring.datasource.url=jdbc:mysql://localhost:3306/e_commerce
 spring.datasource.username=your_mysql_username
@@ -223,7 +236,7 @@ Application runs on `http://localhost:8080`
 
 ---
 
-### 🛒 Cart APIs (JWT Token Required — User)
+### 🛒 Cart APIs (JWT Token Required)
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -242,7 +255,7 @@ Application runs on `http://localhost:8080`
 | GET | `/api/admin/products/search?keyword=phone` | Search all products |
 | POST | `/api/admin/add/product` | Add new product |
 | PUT | `/api/admin/update/product/{id}` | Update product |
-| DELETE | `/api/admin/delete/product/{id}` | Delete product |
+| DELETE | `/api/admin/delete/product/{id}` | Soft delete product |
 
 **Add/Update Product Request Body:**
 ```json
@@ -261,12 +274,30 @@ Application runs on `http://localhost:8080`
 ## 🔑 How to Use JWT in Postman
 
 **Step 1 — Login and copy token:**
+```
 POST http://localhost:8080/api/auth/login
 Response: { "token": "eyJhbGci..." }
+```
 
 **Step 2 — Add token to every request:**
+```
 Headers:
 Authorization: Bearer eyJhbGci...
+```
+
+---
+
+## 📌 Postman Testing Order
+
+1. Register admin → `POST /api/auth/register/admin`
+2. Register user → `POST /api/auth/register/user`
+3. Login as admin → `POST /api/auth/login` → copy token
+4. Add products → `POST /api/admin/add/product` *(admin token)*
+5. Login as user → `POST /api/auth/login` → copy token
+6. View products → `GET /api/products` *(user token)*
+7. Add to cart → `POST /api/cart/add/1` *(user token)*
+8. View cart → `GET /api/cart/view` *(user token)*
+9. Remove from cart → `DELETE /api/cart/remove/1` *(user token)*
 
 ---
 
@@ -286,7 +317,7 @@ All errors return a structured response:
 | Exception | HTTP Status | Scenario |
 |---|---|---|
 | ResourceNotFoundException | 404 | Product/User not found |
-| BadRequestException | 400 | Out of stock, cart empty |
+| BadRequestException | 400 | Out of stock, cart empty, product unavailable |
 | ConflictException | 409 | Username/Email already exists |
 | AuthenticationException | 401 | Invalid credentials |
 
@@ -296,3 +327,4 @@ All errors return a structured response:
 
 **Prasanna Talekar**
 - GitHub: [@prasannatalekar](https://github.com/prasannatalekar)
+- LinkedIn: [prasanna-talekar](https://www.linkedin.com/in/prasanna-talekar/)

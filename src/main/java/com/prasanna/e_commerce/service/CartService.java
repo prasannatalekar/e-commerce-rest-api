@@ -59,7 +59,13 @@ public class CartService {
 				existingItem.setQuantity(existingItem.getQuantity()+1);
 				existingItem.setTotalAmount(existingItem.getQuantity() * product.getPrice());
 				
+				product.setStockQuantity(product.getStockQuantity()-1);
+				if (product.getStockQuantity() <= 0)
+				    product.setIsActive(false);
+				productRepo.save(product);
+				
 				cartRepo.save(existingItem);
+				
 				return product.getName()+" quantity updated in cart.";
 			}
 			
@@ -68,6 +74,11 @@ public class CartService {
 			cartItem.setProduct(product);
 			cartItem.setQuantity(1);
 			cartItem.setTotalAmount(product.getPrice());
+			
+			product.setStockQuantity(product.getStockQuantity()-1);
+			if (product.getStockQuantity() <= 0)
+			    product.setIsActive(false);
+			productRepo.save(product);
 			
 			cartRepo.save(cartItem);
 			
@@ -86,9 +97,21 @@ public class CartService {
 			if(cartItem.getQuantity()>1) {
 				cartItem.setQuantity(cartItem.getQuantity()-1);
 				cartItem.setTotalAmount(cartItem.getQuantity() * product.getPrice());
+				
+				product.setStockQuantity(product.getStockQuantity()+1);
+				if (product.getStockQuantity() > 0)
+				    product.setIsActive(true);
+				productRepo.save(product);
+				
 				cartRepo.save(cartItem);
+				
 				return product.getName()+" quantity reduced in cart.";
 			}
+						
+			product.setStockQuantity(product.getStockQuantity()+1);
+			if (product.getStockQuantity() > 0)
+			    product.setIsActive(true);
+			productRepo.save(product);
 			
 			cartRepo.delete(cartItem);
 			
